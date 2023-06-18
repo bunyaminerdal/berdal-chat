@@ -1,34 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Demo on Vercel
+
+[Demo Chat](https://chat.bunyaminerdal.dev/)
+
+## How to Use
+The application has a simple usage for demonstration purposes.
+You can only log in with a chat ID. If the chat ID you want to log in with exists in the database, you will be logged in. Otherwise, it will be added.
+You can also add another chat ID you want to chat with by clicking the "Add Contact" button.
+When creating a chat room, the system will search the database using only the chat ID.
+If the person you entered with the chat ID is exists, the chat room will be automatically added for both of you.
+The list of chat rooms will be visible on the dashboard.
+Happy Chats!
 
 ## Getting Started
+### First clone repository 
+```bash
+git clone https://github.com/bunyaminerdal/berdal-chat.git
+```
+### Go to project directory
+```bash
+cd berdal-chat
+```
+### Install node modules
+```bash
+npm install
+```
+### Set up env
+rename .example.env to .env and fill properly with your [supabase](https://supabase.com/) account
 
-First, run the development server:
+### push prisma schema to your db
+```bash
+npx prisma db push
+```
+get more information about [prisma](https://www.prisma.io/docs)
 
+### run locally
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
