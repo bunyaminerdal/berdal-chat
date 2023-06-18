@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Todo {
+  id          String   @id @default(cuid())
+  content     String
+  isDone      Boolean  @default(false)
+  createdDate DateTime @default(now())
+  updatedDate DateTime @updatedAt()
+  todoListId  String
+
+  todoList TodoList @relation(fields: [todoListId], references: [id], onDelete: Cascade)
+}
+
+model TodoList {
+  id          String   @id @default(cuid())
+  title       String
+  todos       Todo[]
+  createdDate DateTime @default(now())
+  updatedDate DateTime @updatedAt()
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  text        String
+  senderId    String
+  senderName  String
+  roomId      String
+  createdDate DateTime @default(now())
+  updatedDate DateTime @updatedAt()
+
+  sender Sender @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+}
+
+model Sender {
+  id          String   @id @default(uuid())
+  createdDate DateTime @default(now())
+  updatedDate DateTime @updatedAt()
+  name        String
+
+  messages Message[]
+  rooms    String[]
+  contacts String[]
+}
+
+model Room {
+  id          String    @id @default(uuid())
+  createdDate DateTime  @default(now())
+  updatedDate DateTime  @updatedAt()
+  name        String
+  senders     String[]
+  messages    Message[]
+}
