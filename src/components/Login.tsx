@@ -19,11 +19,11 @@ const Login = () => {
       }
     }
   };
-  const handleCreate = async () => {
-    const randomId = uuidv4();
-    const newSender = await createSender(randomId);
-    if (newSender) push(`/${newSender.id}`);
-  };
+  // const handleCreate = async () => {
+  //   const randomId = uuidv4();
+  //   const newSender = await createSender(randomId);
+  //   if (newSender) push(`/${newSender.id}`);
+  // };
   return (
     <div className="w-full flex justify-center">
       <div className="w-full flex flex-col items-center p-5 max-w-md">
@@ -40,13 +40,13 @@ const Login = () => {
                 ref={inputRef}
               />
               <div className="join justify-end">
-                <button
+                {/* <button
                   className="btn join-item"
                   type="button"
                   onClick={handleCreate}
                 >
                   Create New Chat Id
-                </button>
+                </button> */}
                 <button className="btn btn-primary join-item" type="submit">
                   login
                 </button>
