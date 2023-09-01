@@ -24,7 +24,7 @@ const Dashboard = ({ children }: PropsWithChildren) => {
   const { data: rooms, isLoading: isLoadingRooms } = useRoomsBySenderName(
     senderInfo?.data?.name
   );
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!!roomId?.toString() ? false : true);
   const [openAddContact, setOpenAddContact] = useState(false);
   const handleCopy = (id: string) => {
     navigator.clipboard.writeText(id);
@@ -51,10 +51,10 @@ const Dashboard = ({ children }: PropsWithChildren) => {
           <input type="checkbox" onChange={() => setOpen((prev) => !prev)} />
 
           {/* hamburger icon */}
-          <RxHamburgerMenu className="h-8 w-8 swap-off " />
+          <RxHamburgerMenu className="h-8 w-8 swap-on " />
 
           {/* close icon */}
-          <TfiClose className="h-8 w-8 swap-on " />
+          <TfiClose className="h-8 w-8 swap-off " />
         </label>
       </nav>
       <div className="w-full flex flex-row grow overflow-hidden ">
@@ -77,7 +77,10 @@ const Dashboard = ({ children }: PropsWithChildren) => {
                     } rounded-lg`}
                   >
                     <a
-                      onClick={() => push(`/${senderInfo.data.id}/${room.id}`)}
+                      onClick={() => {
+                        push(`/${senderInfo.data.id}/${room.id}`);
+                        setOpen((prev) => !prev);
+                      }}
                     >
                       <RiWechatLine className="w-6 h-6 text-primary" />
                       <span className="text-lg font-semibold">{room.name}</span>
@@ -115,6 +118,7 @@ const Dashboard = ({ children }: PropsWithChildren) => {
         open={openAddContact}
         setOpen={setOpenAddContact}
         sender={senderInfo?.data}
+        callBack={setOpen}
       />
     </div>
   );

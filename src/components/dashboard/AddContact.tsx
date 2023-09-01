@@ -8,10 +8,12 @@ const AddContact = ({
   open = false,
   setOpen,
   sender,
+  callBack,
 }: {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   sender?: Sender;
+  callBack: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { data, mutate } = useSenderById(sender?.id);
   const { mutate: mutateRooms } = useRoomsBySenderName(sender?.name);
@@ -38,6 +40,7 @@ const AddContact = ({
         await mutate();
         await mutateRooms();
         setOpen(false);
+        callBack(true);
       } catch (error) {
         console.log(error);
       }
