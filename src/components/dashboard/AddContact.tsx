@@ -1,4 +1,4 @@
-import React, { FormEvent, useRef } from "react";
+import React, { FormEvent, useRef, useState } from "react";
 import Input from "../styled/Input";
 import { addContact, updateSender } from "@/services/chatService";
 import useSenderById from "@/hooks/useSenderById";
@@ -15,6 +15,7 @@ const AddContact = ({
   sender?: Sender;
   callBack: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const [loading, setLoading] = useState(false);
   const { data, mutate } = useSenderById(sender?.id);
   const { mutate: mutateRooms } = useRoomsBySenderName(sender?.name);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +31,7 @@ const AddContact = ({
     ) {
       if (inputRef.current.value?.length < 3) return;
       try {
+        setLoading(true);
         await addContact(
           data.data?.id,
           [...data.data.contacts, inputRef.current.value],
@@ -43,6 +45,8 @@ const AddContact = ({
         callBack(true);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -73,8 +77,14 @@ const AddContact = ({
                 type="text"
                 placeholder="Enter Chat Id"
                 ref={inputRef}
+                minLength={3}
               />
-              <button className="btn btn-primary" type="submit">
+              <button
+                className={`btn btn-primary ${
+                  loading ? "btn-disabled btn-outline" : ""
+                }`}
+                type="submit"
+              >
                 Add
               </button>
             </div>

@@ -13,10 +13,14 @@ export default async function handler(
     try {
       const { contactNames, newContactName, rooms, senderName } = req.body;
       if (!senderName && !newContactName) return;
+      const roomName = senderName + "-" + newContactName?.toString();
+      const room = await prisma.room.findFirst({ where: { name: roomName } });
+      if (room)
+        return res.status(200).json({ message: "Room already exists!" });
       const createdRoom = await prisma.room.create({
         data: {
           senders: [senderName?.toString(), newContactName?.toString()],
-          name: senderName + "-" + newContactName?.toString(),
+          name: roomName,
         },
       });
       const updatedSender = await prisma.sender.update({
@@ -29,8 +33,8 @@ export default async function handler(
 
       res.status(200).json(updatedSender);
     } catch (error) {
-      const saf = error as AxiosError;
-      res.status(422).json({ message: saf.message });
+      const axiosError = error as AxiosError;
+      res.status(422).json({ message: axiosError.message });
     }
     return;
   }

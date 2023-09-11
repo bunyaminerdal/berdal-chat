@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, MutableRefObject, useRef } from "react";
+import React, { FormEvent, MutableRefObject, useRef, useState } from "react";
 import Input from "./styled/Input";
 import { v4 as uuidv4 } from "uuid";
 import { createSender } from "@/services/chatService";
@@ -7,23 +7,24 @@ import { useRouter } from "next/router";
 
 const Login = () => {
   const { push } = useRouter();
+  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (inputRef.current) {
+      if (inputRef.current.value?.length < 3) return;
+      setLoading(true);
       try {
         const sender = await createSender(inputRef.current.value);
         if (sender) push(`/${sender.id}`);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoading(false);
       }
     }
   };
-  // const handleCreate = async () => {
-  //   const randomId = uuidv4();
-  //   const newSender = await createSender(randomId);
-  //   if (newSender) push(`/${newSender.id}`);
-  // };
+
   return (
     <div className="w-full flex justify-center">
       <div className="w-full flex flex-col items-center p-5 max-w-md">
@@ -38,16 +39,15 @@ const Login = () => {
                 type="text"
                 placeholder="Enter Chat Id"
                 ref={inputRef}
+                minLength={3}
               />
-              <div className="join justify-end">
-                {/* <button
-                  className="btn join-item"
-                  type="button"
-                  onClick={handleCreate}
+              <div className="justify-end">
+                <button
+                  className={`btn btn-primary ${
+                    loading ? "btn-disabled btn-outline" : ""
+                  }`}
+                  type="submit"
                 >
-                  Create New Chat Id
-                </button> */}
-                <button className="btn btn-primary join-item" type="submit">
                   login
                 </button>
               </div>

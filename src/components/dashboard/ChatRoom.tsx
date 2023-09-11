@@ -5,8 +5,7 @@ import { useRouter } from "next/router";
 import { createMessage } from "@/services/chatService";
 import { v4 as uuidv4 } from "uuid";
 import { RealtimeChannel } from "@supabase/supabase-js";
-
-let scrolledDiv: HTMLElement | null;
+import { VList, VListHandle } from "virtua";
 
 const ChatRoom = ({
   senderInfo,
@@ -20,50 +19,19 @@ const ChatRoom = ({
   const {
     query: { roomId, senderId },
   } = useRouter();
-  const [isAutoScroll, setIsAutoScroll] = useState(true);
-  const scrollNumber = Math.floor(window.screen.availHeight / 65);
-  const [extraNumber, setExtraNumber] = useState(scrollNumber);
-  const initialMessages =
-    messageList.length < extraNumber
-      ? messageList
-      : messageList.slice(messageList.length - extraNumber, messageList.length);
-  const [messages, setMessages] = useState<MessageType[]>(
-    initialMessages ?? []
-  );
+  const [messages, setMessages] = useState<MessageType[]>(messageList ?? []);
   const [value, setValue] = useState("");
-
-  const resizeHandler = () => {
-    setExtraNumber((prev) =>
-      prev !== Math.floor(window.screen.availHeight / 65)
-        ? Math.floor(window.screen.availHeight / 65)
-        : prev
-    );
-  };
-  useEffect(() => {
-    scrolledDiv = null;
-    window.onresize = null;
-    if (roomId) {
-      setIsAutoScroll(true);
-      scrolledDiv = document.getElementById("scrolledDiv");
-      window.onresize = resizeHandler;
-      setExtraNumber(scrollNumber);
-    }
-    return () => {
-      scrolledDiv = null;
-      window.onresize = null;
-    };
-  }, [roomId, scrollNumber]);
+  const ref = useRef<VListHandle>(null);
 
   useEffect(() => {
-    setMessages(
-      messageList.length < extraNumber
-        ? messageList
-        : messageList.slice(
-            messageList.length - extraNumber,
-            messageList.length
-          )
-    );
-  }, [extraNumber, messageList]);
+    if (roomId) setMessages(messageList);
+    ref.current?.scrollToIndex(messageList.length);
+  }, [roomId, setMessages, messageList]);
+
+  useEffect(() => {
+    if (messages.length > messageList.length)
+      ref.current?.scrollToIndex(messages.length);
+  }, [messageList.length, messages.length]);
   useEffect(() => {
     if (channel) {
       channel?.on("broadcast", { event: "message" }, (payload: any) => {
@@ -74,18 +42,10 @@ const ChatRoom = ({
     //TODO: we need to checkout message count if sended and received count is different, have to catch up lost messages
   }, [channel]);
 
-  useEffect(() => {
-    if (scrolledDiv && isAutoScroll) {
-      scrolledDiv.scrollTo(0, scrolledDiv.scrollHeight);
-      console.log("scroll changed");
-    }
-  }, [isAutoScroll, messages]);
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!senderInfo?.name || !senderId || !roomId || value?.trim() === "")
       return;
-    setIsAutoScroll(true);
     const tempMessageId = uuidv4();
     channel?.send({
       type: "broadcast",
@@ -105,32 +65,9 @@ const ChatRoom = ({
       value
     );
   };
-  const handleShowOldMessages = () => {
-    if (messageList.length > extraNumber + scrollNumber) {
-      setExtraNumber((prev) => prev + scrollNumber);
-    } else setExtraNumber(messageList.length);
-    setIsAutoScroll(false);
-  };
-
   return (
-    <div
-      id="chat-room"
-      className="w-full flex-col flex justify-end p-2 overflow-hidden"
-    >
-      <div id="scrolledDiv" className="overflow-y-auto flex flex-col mb-3 p-1">
-        <div>
-          {messageList.length > extraNumber ? (
-            <div className="divider p-0 m-0">
-              <button
-                className="btn btn-link"
-                type="button"
-                onClick={handleShowOldMessages}
-              >
-                show older messages
-              </button>
-            </div>
-          ) : null}
-        </div>
+    <div id="chat-room" className="w-full flex-col flex p-2 gap-2">
+      <VList ref={ref} className="w-full" mode="reverse">
         {messages.map((message, index) => (
           <div key={message.id}>
             {index === 0 ? (
@@ -166,7 +103,7 @@ const ChatRoom = ({
             </div>
           </div>
         ))}
-      </div>
+      </VList>
       <div>
         <form onSubmit={handleSubmit}>
           <div className="form-control w-full gap-2">
