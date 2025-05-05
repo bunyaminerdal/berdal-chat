@@ -1,11 +1,10 @@
-import React, { FormEvent, useRef, useState } from "react";
-import Input from "../styled/Input";
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { createMessage } from "@/services/chatService";
-import { v4 as uuidv4 } from "uuid";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { VList, VListHandle } from "virtua";
+import Input from "../styled/Input";
 
 const ChatRoom = ({
   senderInfo,
@@ -67,7 +66,7 @@ const ChatRoom = ({
   };
   return (
     <div id="chat-room" className="w-full flex-col flex p-2 gap-2">
-      <VList ref={ref} className="w-full" mode="reverse">
+      <VList ref={ref} className="w-full" reverse>
         {messages.map((message, index) => (
           <div key={message.id}>
             {index === 0 ? (

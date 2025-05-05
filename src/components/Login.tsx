@@ -1,13 +1,13 @@
 "use client";
-import React, { FormEvent, MutableRefObject, useRef, useState } from "react";
-import Input from "./styled/Input";
-import { v4 as uuidv4 } from "uuid";
 import { createSender } from "@/services/chatService";
 import { useRouter } from "next/router";
+import { FormEvent, useRef, useState } from "react";
+import Input from "./styled/Input";
 
 const Login = () => {
   const { push } = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,7 +18,7 @@ const Login = () => {
         const sender = await createSender(inputRef.current.value);
         if (sender) push(`/${sender.id}`);
       } catch (error) {
-        console.log(error);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -41,15 +41,43 @@ const Login = () => {
                 ref={inputRef}
                 minLength={3}
               />
-              <div className="justify-end">
+              <div className="justify-end flex w-full">
                 <button
                   className={`btn btn-primary ${
                     loading ? "btn-disabled btn-outline" : ""
                   }`}
+                  disabled={error}
                   type="submit"
                 >
-                  login
+                  Login
+                  {loading ? (
+                    <span className="loading loading-spinner"></span>
+                  ) : (
+                    null
+                  )}
                 </button>
+              </div>
+              <div>
+                {error && (
+                  <div className="alert alert-error shadow-lg">
+                    <div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="stroke-current flex-shrink-0 h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                    </div>
+                      <span>{'Server connection has denied! Pls try later!'}</span>
+                  </div>
+                )}
               </div>
             </div>
           </form>
